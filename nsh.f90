@@ -33,14 +33,8 @@ subroutine normalizedSpatialHet(SH, array)
                     x_end = x1 + x2-1
 
                     subarray_mean = 0.0
-                    count = 0
-                    do k = y1, y_end
-                        do j = x1, x_end
-                            subarray_mean = subarray_mean + v_hstack_array(k, j)
-                            count = count + 1
-                        end do
-                    end do
-                    subarray_mean = subarray_mean / count
+                    count = (y_end - y1 + 1) * (x_end - x1 + 1)
+                    subarray_mean = sum(v_hstack_array(y1:y_end, x1:x_end)) / count
                     G = G + abs(subarray_mean - array_mean)
 
                     !print *, 'mean = ', subarray_mean, 'G = ', G
