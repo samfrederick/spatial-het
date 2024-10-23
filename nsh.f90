@@ -1,7 +1,7 @@
 subroutine normalizedSpatialHet(SH, array)
     implicit none
     integer :: y1, y2, x1, x2, y_end, x_end
-    integer :: k, j, count
+    integer :: count
     real(kind=8), intent(out) :: SH ! note that kind=8 for double precision is specific to gfortran!!
     real(kind=8), dimension(:, :), intent(in) :: array
     real(kind=8), dimension(:, :), allocatable :: hstack_array
@@ -37,14 +37,11 @@ subroutine normalizedSpatialHet(SH, array)
                     subarray_mean = sum(v_hstack_array(y1:y_end, x1:x_end)) / count
                     G = G + abs(subarray_mean - array_mean)
 
-                    !print *, 'mean = ', subarray_mean, 'G = ', G
-                    !print *, G, x1,x2,y1,y2
                 end do
             end do
         end do
     end do
-    
-    !print *, 'G = ', G
+
     SH = G*2/(array_mean*n*m*(3*n*m-n-m-1))
     deallocate(hstack_array)
     deallocate(v_hstack_array)
@@ -63,9 +60,8 @@ subroutine monteCarloSpatialHet(SH, array, n_permutes)
     real(kind=8), dimension(:, :), allocatable :: v_hstack_array
     integer, dimension(:, :), allocatable :: permutation_array
     real(kind=8) :: array_mean, subarray_mean
-    real(kind=8) :: G, N
+    real(kind=8) :: G
     integer, dimension(2) :: dim
-    real(kind=8) :: num, denom
     integer :: d1, d2
     integer :: total_permutes
     real(kind=8) :: scaling_factor
@@ -74,7 +70,6 @@ subroutine monteCarloSpatialHet(SH, array, n_permutes)
     dim = shape(array)
     d1 = dim(1)
     d2 = dim(2)
-    !total_permutes = (d1*(d1-1)+1)*(d2*(d2-1)+1)
     total_permutes = d1*d1*d2*d2
 
     if (n_permutes > total_permutes) then
@@ -104,8 +99,9 @@ subroutine monteCarloSpatialHet(SH, array, n_permutes)
             end do
         end do
         subarray_mean = subarray_mean / count
+
         G = G + abs(subarray_mean - array_mean)
-        !print *, x1, x2, y1, y2, G
+        
     end do
 
     SH = G*2/(array_mean*d1*d2*(3*d1*d2-d1-d2-1))
